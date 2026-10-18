@@ -1,0 +1,55 @@
+# Deployments are chosen over StatefulSets because bramly-sample-nodejs is a stateless web app.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bramly-sample-nodejs
+  labels:
+    app: bramly-sample-nodejs
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: bramly-sample-nodejs
+  template:
+    metadata:
+      labels:
+        app: bramly-sample-nodejs
+    spec:
+      containers:
+        - name: bramly-sample-nodejs
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+
+          # Inject environment variables from ConfigMap (currently only PORT)
+          envFrom:
+            - configMapRef:
+                name: bramly-sample-nodejs-config
+
+          # Checks if the Node.js process is alive, if this fails kubernetes restarts the pod.
+          livenessProbe:
+            httpGet:
+              path: /live
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          # Checks if the app is ready to serve traffic, during startup traffic will not be sent here until /ready responds 200 OK.
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          # Resource Management, should prevent out-of-memory crashes
+          resources:
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}

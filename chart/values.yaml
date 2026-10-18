@@ -1,0 +1,35 @@
+# Scaling: Number of pod replicas to run (our app is stateless so we can easily scale up or down)
+replicaCount: 1
+
+# Image Configuration: tag is updated automatically by our pipeline with the commit SHA
+image:
+  repository: ghcr.io/bramlybar/bramly-sample-nodejs
+  pullPolicy: IfNotPresent
+  tag: "latest"
+
+# Service Configuration: provides internal cluster networking
+service:
+  type: ClusterIP
+  port: 8080
+
+# Ingress Configuration: provides external access to the application
+ingress:
+  enabled: true
+  host: bramly-sample-nodejs.local
+  path: /
+
+# Resource Management
+resources:
+  # pod gets at least this much CPU/RAM to start
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  # pod gets no more than this much CPU/RAM, to prevent memory leaks or bugs from consuming all resources
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+# Application Configuration
+config:
+  # Injects the PORT environment variable to configmap to avoid hardcoding it in the Dockerfile
+  PORT: "8080"

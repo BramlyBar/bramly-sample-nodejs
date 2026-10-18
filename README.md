@@ -11,6 +11,10 @@ A lightweight Node.js application. It features basic web endpoints, Prometheus m
 - Readiness and liveness probe endpoints
 - Customizable port via environment variable
 
+## Deployment
+
+Kubernetes manifests and Helm chart are managed via GitOps in [bramly-sample-nodejs-gitops](https://github.com/BramlyBar/bramly-sample-nodejs-gitops).
+
 ## Prerequisites
 
 - Node.js (v22.1.0)

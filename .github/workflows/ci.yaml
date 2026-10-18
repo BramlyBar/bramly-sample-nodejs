@@ -1,4 +1,4 @@
-name: DevSecOps CI Pipeline
+name: DevSecOps CI/CD Pipeline
 
 on:
   push:
@@ -104,3 +104,32 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+
+  # GitOps Deployment (Update GitOps Repository)
+  update-gitops-repo:
+    name: Trigger ArgoCD GitOps Deployment
+    needs: build-and-scan
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      # Checkout the dedicated GitOps repository using PAT
+      - name: Checkout GitOps Repository
+        uses: actions/checkout@v4
+        with:
+          repository: 'BramlyBar/bramly-sample-nodejs-gitops'
+          token: ${{ secrets.GITOPS_PAT }}
+          path: 'gitops'
+
+      # Bump the image tag in values.yaml to the newly pushed commit SHA
+      - name: Update Helm Image Tag
+        run: |
+          cd gitops
+          # Update the image tag in values.yaml to trigger ArgoCD sync
+          sed -i 's/tag: .*/tag: "sha-${{ github.sha }}"/' chart/values.yaml
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add chart/values.yaml
+          git commit -m "cd: Update image tag to sha-${{ github.sha }} [skip ci]"
+          git push origin main

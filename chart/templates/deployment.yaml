@@ -1,4 +1,8 @@
-# Deployments are chosen over StatefulSets because bramly-sample-nodejs is a stateless web app.
+# I chose Deployment over StatefulSet for the following reasons
+# 1) No data saved to disk: the app handles HTTP requests (/my-app, /ready, /live) and sends back a response, it doesn't store any uploaded files or write to database
+# 2) All pods are the same: Any pod can handle any incoming request
+# 3) Pods are disposable: if one crashes k8s destroys it and creates a new one and data is not lost because of the reasons in (1)
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:

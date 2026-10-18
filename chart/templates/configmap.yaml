@@ -1,3 +1,4 @@
+# Decouples environment configuration from Docker image and application code (so if we need to change port we edit the configmap)
 apiVersion: v1
 kind: ConfigMap
 metadata:

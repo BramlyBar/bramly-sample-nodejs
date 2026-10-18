@@ -1,3 +1,4 @@
+# Deployments are chosen over StatefulSets because bramly-sample-nodejs is a stateless web app.
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,10 +24,12 @@ spec:
               containerPort: {{ .Values.service.port }}
               protocol: TCP
 
+          # Inject environment variables from ConfigMap (currently only PORT)
           envFrom:
             - configMapRef:
                 name: bramly-sample-nodejs-config
 
+          # Checks if the Node.js process is alive, if this fails kubernetes restarts the pod.
           livenessProbe:
             httpGet:
               path: /live
@@ -34,6 +37,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 
+          # Checks if the app is ready to serve traffic, during startup traffic will not be sent here until /ready responds 200 OK.
           readinessProbe:
             httpGet:
               path: /ready
@@ -41,6 +45,7 @@ spec:
             initialDelaySeconds: 5
             periodSeconds: 10
 
+          # Resource Management, should prevent out-of-memory crashes
           resources:
             requests:
               cpu: {{ .Values.resources.requests.cpu }}

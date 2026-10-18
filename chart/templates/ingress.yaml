@@ -1,3 +1,4 @@
+# Ingress acts as the entry point from outside the cluster, routing HTTP requests arriving at the host to our internal clusterIP service on port 8080.
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:

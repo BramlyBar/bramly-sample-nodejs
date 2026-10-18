@@ -1,3 +1,4 @@
+# ClusterIP provides a stable internal IP and cluster-internal DNS name so other pods or Ingress can reach the application without tracking changing pod IPs.
 apiVersion: v1
 kind: Service
 metadata:

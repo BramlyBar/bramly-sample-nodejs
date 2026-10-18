@@ -27,3 +27,12 @@ CMD [ "node", "app.js" ]
 # http://localhost:8080/my-app (The main endpoint)
 # http://localhost:8080/about (The about page)
 # http://localhost:8080/metrics (The Prometheus metrics)
+
+
+# To check vulnerabilities before we start we used:
+# docker run --rm -v "$($PWD.Path):/app" -w /app node:22-alpine npm audit
+# Which resulted in: 5 vulnerabilities (2 moderate, 2 high, 1 critical)
+
+# To fix those vulnerabilities we used:
+# docker run --rm -v "$($PWD.Path):/app" -w /app node:22-alpine npm audit fix
+# Which created a new package-lock.json needed to create an image without those vulnerabilities
